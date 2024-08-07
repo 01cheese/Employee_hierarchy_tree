@@ -1,12 +1,11 @@
-from django.shortcuts import render
-from employees.models import Employee
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from .models import Employee
 from django.db.models import Q
 from django.core.paginator import Paginator
 
-
 def home(request):
     return render(request, 'home.html')
-
 
 def employee_tree(request):
     top_level_employees = Employee.objects.filter(manager__isnull=True)
@@ -15,12 +14,11 @@ def employee_tree(request):
     }
     return render(request, 'tree.html', context)
 
-
 def employee_list(request):
     query = request.GET.get('q', '')
     sort_by = request.GET.get('sort', 'full_name')
     page_number = request.GET.get('page', 1)
-    items_per_page = request.GET.get('items_per_page', 50)  # Кількість записів на сторінку, за замовчуванням 50
+    items_per_page = request.GET.get('items_per_page', 50)
 
     if query:
         employees = Employee.objects.filter(
@@ -41,3 +39,8 @@ def employee_list(request):
         'items_per_page': items_per_page
     }
     return render(request, 'list.html', context)
+
+def employee_subordinates(request, employee_id):
+    employee = get_object_or_404(Employee, id=employee_id)
+    subordinates = list(employee.subordinates.values('id', 'full_name', 'position'))
+    return JsonResponse(subordinates, safe=False)
