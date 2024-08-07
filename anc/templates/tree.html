@@ -20,13 +20,14 @@
                 <li class="list-group-item">
                     <strong>{{ employee.full_name }}</strong> - {{ employee.position }}
                     <button class="btn btn-link toggle-subordinates" data-id="{{ employee.id }}">Показати підлеглих</button>
-                    <ul class="list-group subordinates" id="subordinates-{{ employee.id }}"></ul>
+                    <ul class="list-group subordinates" id="subordinates-{{ employee.id }}" data-id="{{ employee.id }}"></ul>
                 </li>
             {% endfor %}
         </ul>
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script>
         $(document).ready(function() {
             console.log('Document is ready');
@@ -48,13 +49,14 @@
                             } else {
                                 button.text('Приховати підлеглих');
                                 data.forEach(function(subordinate) {
-                                    var listItem = $('<li class="list-group-item">').html('<strong>' + subordinate.full_name + '</strong> - ' + subordinate.position);
+                                    var listItem = $('<li class="list-group-item" data-id="' + subordinate.id + '">').html('<strong>' + subordinate.full_name + '</strong> - ' + subordinate.position);
                                     var subButton = $('<button class="btn btn-link toggle-subordinates" data-id="' + subordinate.id + '">Показати підлеглих</button>');
                                     listItem.append(subButton);
-                                    var subList = $('<ul class="list-group subordinates" id="subordinates-' + subordinate.id + '"></ul>');
+                                    var subList = $('<ul class="list-group subordinates" id="subordinates-' + subordinate.id + '" data-id="' + subordinate.id + '"></ul>');
                                     listItem.append(subList);
                                     subordinatesList.append(listItem);
                                 });
+                                initSortable();
                             }
                         },
                         error: function() {
@@ -71,6 +73,36 @@
                     }
                 }
             });
+
+            function initSortable() {
+                $('.subordinates').each(function() {
+                    new Sortable(this, {
+                        group: 'shared',
+                        animation: 150,
+                        onEnd: function(evt) {
+                            var itemEl = evt.item;
+                            var newManagerId = $(itemEl).closest('ul').data('id');
+                            var employeeId = $(itemEl).data('id');
+
+                            $.ajax({
+                                url: '{% url "employee_update_manager" %}',
+                                method: 'POST',
+                                data: {
+                                    'employee_id': employeeId,
+                                    'new_manager_id': newManagerId,
+                                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                },
+                                error: function() {
+                                    alert('Error updating manager');
+                                }
+                            });
+                        }
+                    });
+                });
+            }
+
+            // Initial initialization of sortable elements
+            initSortable();
         });
     </script>
 </body>

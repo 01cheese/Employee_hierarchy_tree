@@ -1,19 +1,12 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body>
-    <div class="container mt-5">
-        <h1>Welcome to the Employee Management System</h1>
-        <p><a href="{% url 'employee_tree' %}" class="btn btn-primary">View Employee Tree</a></p>
-        <p><a href="{% url 'employee_list' %}" class="btn btn-secondary">View Employee List</a></p>
-    </div>
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h1>Welcome to the Employee Management System</h1>
+{% if user.is_authenticated %}
+    <p><a href="{% url 'employee_list' %}">View Employee List</a></p>
+{% else %}
+    <p><a href="{% url 'login' %}">Login</a> or <a href="{% url 'register' %}">Register</a> to view the employee list.</p>
+{% endif %}
+{% endblock %}

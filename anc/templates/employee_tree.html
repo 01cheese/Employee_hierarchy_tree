@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Hierarchy</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Employee Hierarchy</h1>
+        <ul id="employee-tree">
+            {% include 'subordinates.html' with employees=employees %}
+        </ul>
+        <a href="{% url 'employee_list' %}" class="btn btn-secondary">Back to List</a>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.toggle-subordinates').click(function() {
+                var button = $(this);
+                var employeeId = button.data('id');
+                var subordinatesList = $('#subordinates-' + employeeId);
+
+                if (subordinatesList.children().length === 0) {
+                    $.ajax({
+                        url: '{% url "employee_subordinates" 0 %}'.replace('0', employeeId),
+                        method: 'GET',
+                        success: function(data) {
+                            data.forEach(function(subordinate) {
+                                var listItem = $('<li>').text(subordinate.full_name + ' - ' + subordinate.position);
+                                var subButton = $('<button>').text('Toggle Subordinates').addClass('btn btn-link toggle-subordinates').attr('data-id', subordinate.id);
+                                listItem.append(subButton);
+                                var subList = $('<ul>').attr('id', 'subordinates-' + subordinate.id);
+                                listItem.append(subList);
+                                subordinatesList.append(listItem);
+                            });
+                        },
+                        error: function() {
+                            alert('Error loading subordinates');
+                        }
+                    });
+                } else {
+                    subordinatesList.toggle();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
