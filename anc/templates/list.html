@@ -1,0 +1,102 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee List</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Employee List</h1>
+        <form id="searchForm" class="form-inline mb-3">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search..." class="form-control mr-2">
+            <select name="sort" class="form-control mr-2">
+                <option value="full_name" {% if sort_by == 'full_name' %}selected{% endif %}>Name</option>
+                <option value="position" {% if sort_by == 'position' %}selected{% endif %}>Position</option>
+                <option value="date_of_hire" {% if sort_by == 'date_of_hire' %}selected{% endif %}>Date of Hire</option>
+                <option value="email" {% if sort_by == 'email' %}selected{% endif %}>Email</option>
+            </select>
+            <select name="items_per_page" class="form-control mr-2">
+                <option value="50" {% if items_per_page == '50' %}selected{% endif %}>50</option>
+                <option value="100" {% if items_per_page == '100' %}selected{% endif %}>100</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Date of Hire</th>
+                    <th>Email</th>
+                    <th>Manager</th>
+                </tr>
+            </thead>
+            <tbody id="employeeTable">
+                {% for employee in page_obj %}
+                    <tr>
+                        <td>{{ employee.full_name }}</td>
+                        <td>{{ employee.position }}</td>
+                        <td>{{ employee.date_of_hire }}</td>
+                        <td>{{ employee.email }}</td>
+                        <td>
+                            {% if employee.manager %}
+                                {{ employee.manager.full_name }}
+                            {% else %}
+                                None
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&sort={{ sort_by }}&items_per_page={{ items_per_page }}&page={{ page_obj.previous_page_number }}">Previous</a>
+                    </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    {% if num == page_obj.number %}
+                        <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                    {% elif num == 1 or num == page_obj.paginator.num_pages or num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+                        <li class="page-item"><a class="page-link" href="?q={{ query }}&sort={{ sort_by }}&items_per_page={{ items_per_page }}&page={{ num }}">{{ num }}</a></li>
+                    {% elif num == page_obj.number|add:"-3" or num == page_obj.number|add:"3" %}
+                        <li class="page-item disabled"><a class="page-link" href="#">...</a></li>
+                    {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?q={{ query }}&sort={{ sort_by }}&items_per_page={{ items_per_page }}&page={{ page_obj.next_page_number }}">Next</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#searchForm').on('submit', function(event) {
+                event.preventDefault();
+                $.ajax({
+                    url: '{% url "employee_list" %}',
+                    data: $(this).serialize(),
+                    success: function(data) {
+                        $('#employeeTable').html($(data).find('#employeeTable').html());
+                        $('.pagination').html($(data).find('.pagination').html());
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

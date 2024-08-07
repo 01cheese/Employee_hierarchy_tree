@@ -1,0 +1,8 @@
+<ul class="list-group ml-3">
+    {% for subordinate in manager.subordinates.all %}
+        <li class="list-group-item">
+            <strong>{{ subordinate.full_name }}</strong> - {{ subordinate.position }}
+            {% include 'subordinates.html' with manager=subordinate %}
+        </li>
+    {% endfor %}
+</ul>

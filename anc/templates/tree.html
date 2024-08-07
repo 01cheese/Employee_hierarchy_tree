@@ -1,0 +1,25 @@
+{%  load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Hierarchy</title>
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Employee Hierarchy</h1>
+        <ul class="list-group">
+            {% for employee in top_level_employees %}
+                <li class="list-group-item">
+                    <strong>{{ employee.full_name }}</strong> - {{ employee.position }}
+                    {% include 'subordinates.html' with manager=employee %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
