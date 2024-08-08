@@ -3,11 +3,17 @@
 {% block title %}Delete Employee{% endblock %}
 
 {% block content %}
-<h1>Delete Employee</h1>
-<p>Are you sure you want to delete {{ employee.full_name }}?</p>
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="{% url 'employee_list' %}" class="btn btn-secondary">Cancel</a>
-</form>
+<div class="card">
+    <div class="card-header">
+        <h1 class="h3">Delete Employee</h1>
+    </div>
+    <div class="card-body">
+        <p>Are you sure you want to delete {{ employee.full_name }}?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
+            <a href="{% url 'employee_list' %}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Cancel</a>
+        </form>
+    </div>
+</div>
 {% endblock %}

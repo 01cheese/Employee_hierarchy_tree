@@ -30,7 +30,7 @@ def register(request):
             return redirect('employee_list')
     else:
         form = UserCreationForm()
-    return render(request, 'registration/register.html', {'form': form})
+    return render(request, 'register.html', {'form': form})
 
 def home(request):
     return render(request, 'home.html')

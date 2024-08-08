@@ -3,10 +3,15 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>Welcome to the Employee Management System</h1>
-{% if user.is_authenticated %}
-    <p><a href="{% url 'employee_list' %}">View Employee List</a></p>
-{% else %}
-    <p><a href="{% url 'login' %}">Login</a> or <a href="{% url 'register' %}">Register</a> to view the employee list.</p>
-{% endif %}
+<div class="jumbotron text-center bg-light">
+    <h1 class="display-4">Welcome to the Employee Management System</h1>
+    <p class="lead">Manage your company's employees efficiently and effectively.</p>
+    <hr class="my-4">
+    {% if user.is_authenticated %}
+        <a class="btn btn-primary btn-lg" href="{% url 'employee_list' %}" role="button">View Employee List</a>
+    {% else %}
+        <a class="btn btn-primary btn-lg" href="{% url 'login' %}" role="button">Login</a>
+        <a class="btn btn-secondary btn-lg" href="{% url 'register' %}" role="button">Register</a>
+    {% endif %}
+</div>
 {% endblock %}
