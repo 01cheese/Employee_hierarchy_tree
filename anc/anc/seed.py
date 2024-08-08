@@ -4,6 +4,7 @@ from faker import Faker
 import os
 import django
 
+# Устанавливаем настройки Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'anc.settings')
 django.setup()
 
@@ -11,9 +12,9 @@ from employees.models import Employee
 
 faker = Faker()
 
-
+# Функция для заполнения базы данных начальными данными
 def run():
-    # Create top level managers
+    # Создаем топ-менеджеров
     top_managers = [Employee.objects.create(
         full_name=faker.name(),
         position='Top Manager',
@@ -22,7 +23,7 @@ def run():
         manager=None
     ) for _ in range(10)]
 
-    # Create a function to recursively add subordinates
+    # Рекурсивная функция для добавления подчиненных
     def add_subordinates(manager, level):
         if level > 7:
             return
@@ -37,9 +38,10 @@ def run():
             )
             add_subordinates(employee, level + 1)
 
+    # Добавляем подчиненных к каждому топ-менеджеру
     for manager in top_managers:
         add_subordinates(manager, 1)
 
-
+# Запуск функции
 if __name__ == "__main__":
     run()

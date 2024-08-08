@@ -7,50 +7,45 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Employee
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Employee
 from .forms import EmployeeForm
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.forms import UserCreationForm
-from django.shortcuts import render, redirect
 
-
-
+# Представление для регистрации пользователя
 def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
+            form.save()  # Сохраняем нового пользователя
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=password)
-            login(request, user)
-            return redirect('employee_list')
+            user = authenticate(username=username, password=password)  # Аутентифицируем нового пользователя
+            login(request, user)  # Выполняем вход пользователя
+            return redirect('employee_list')  # Перенаправляем на список сотрудников
     else:
         form = UserCreationForm()
     return render(request, 'register.html', {'form': form})
 
+# Представление для домашней страницы
 def home(request):
     return render(request, 'home.html')
 
-
+# Представление для отображения иерархии сотрудников, доступно только для аутентифицированных пользователей
 @login_required
 def employee_tree(request):
-    top_level_employees = Employee.objects.filter(manager__isnull=True)
+    top_level_employees = Employee.objects.filter(manager__isnull=True)  # Получаем топ-менеджеров (без менеджера)
     context = {
         'top_level_employees': top_level_employees
     }
     return render(request, 'tree.html', context)
 
-
+# Представление для списка сотрудников, доступно только для аутентифицированных пользователей
 @login_required
 def employee_list(request):
-    query = request.GET.get('q', '')
-    sort_by = request.GET.get('sort', 'full_name')
-    page_number = request.GET.get('page', 1)
-    items_per_page = request.GET.get('items_per_page', 50)
+    query = request.GET.get('q', '')  # Получаем поисковый запрос
+    sort_by = request.GET.get('sort', 'full_name')  # Получаем параметр сортировки
+    page_number = request.GET.get('page', 1)  # Получаем номер страницы
+    items_per_page = request.GET.get('items_per_page', 50)  # Получаем количество элементов на странице
 
     if query:
         employees = Employee.objects.filter(
@@ -72,8 +67,7 @@ def employee_list(request):
     }
     return render(request, 'list.html', context)
 
-
-
+# Представление для поиска менеджеров (AJAX запрос)
 def search_managers(request):
     if request.is_ajax():
         query = request.GET.get('q', '')
@@ -87,14 +81,13 @@ def search_managers(request):
         return JsonResponse({'results': results})
     return JsonResponse({'results': []})
 
-
-
+# Представление для получения подчиненных сотрудников (AJAX запрос)
 def employee_subordinates(request, employee_id):
     employee = get_object_or_404(Employee, id=employee_id)
     subordinates = list(employee.subordinates.values('id', 'full_name', 'position'))
     return JsonResponse(subordinates, safe=False)
 
-
+# Представление для создания нового сотрудника, доступно только для аутентифицированных пользователей
 @login_required
 def employee_create(request):
     if request.method == 'POST':
@@ -106,6 +99,7 @@ def employee_create(request):
         form = EmployeeForm()
     return render(request, 'employee_form.html', {'form': form})
 
+# Представление для обновления информации о сотруднике, доступно только для аутентифицированных пользователей
 @login_required
 def employee_update(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
@@ -113,14 +107,12 @@ def employee_update(request, pk):
         form = EmployeeForm(request.POST, instance=employee)
         if form.is_valid():
             form.save()
-            print("Form is valid and saved")
             return redirect('employee_list')
-        else:
-            print("Form is invalid")
     else:
         form = EmployeeForm(instance=employee)
     return render(request, 'employee_form.html', {'form': form})
 
+# Представление для удаления сотрудника, доступно только для аутентифицированных пользователей
 @login_required
 def employee_delete(request, pk):
     employee = get_object_or_404(Employee, pk=pk)
@@ -129,7 +121,7 @@ def employee_delete(request, pk):
         return redirect('employee_list')
     return render(request, 'employee_confirm_delete.html', {'employee': employee})
 
-
+# Представление для обновления менеджера сотрудника (AJAX запрос), доступно только для аутентифицированных пользователей
 @csrf_exempt
 @login_required
 def update_manager(request):

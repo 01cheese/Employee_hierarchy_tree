@@ -138,7 +138,7 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# anc/settings.py
+# Настройки для перенаправления после входа/выхода
 
 LOGIN_REDIRECT_URL = 'employee_list'  # Куди редиректити після успішного входу
 LOGOUT_REDIRECT_URL = 'home'          # Куди редиректити після виходу
