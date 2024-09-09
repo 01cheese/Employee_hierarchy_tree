@@ -1,7 +1,8 @@
-```
+
 Here’s the English translation and the full structure for the Employee Management System project file:
 
-```markdown
+```
+
 # Employee Management System
 
 ## Project Description
@@ -12,7 +13,7 @@ The Employee Management System is a Django-based web application designed to man
 - View the list of employees
 - View the hierarchy of employees
 - Create, update, and delete employees
-
+```
 ## Table of Contents
 
 - [Technologies](#technologies)
@@ -26,7 +27,7 @@ The Employee Management System is a Django-based web application designed to man
 - [Static Files](#static-files)
 - [Security](#security)
 - [Screenshots](#screenshots)
-
+```
 ## Technologies
 
 The project uses the following technologies:
@@ -74,7 +75,7 @@ To get started with the project, follow these steps:
     ```bash
     python manage.py runserver
     ```
-
+```
 Open your browser and navigate to `http://127.0.0.1:8000/` to view the application.
 
 ## Model Descriptions
@@ -98,6 +99,7 @@ class Employee(models.Model):
 
     def __str__(self):
         return self.full_name
+
 ```
 
 ## Forms
